@@ -5,17 +5,10 @@ import json
 from docx import Document
 from docx.shared import RGBColor
 from docx.oxml.ns import qn
-from docx.oxml import OxmlElement
-from docx.enum.text import WD_UNDERLINE, WD_PARAGRAPH_ALIGNMENT
-from docx.enum.section import WD_SECTION
+from docx.enum.text import WD_UNDERLINE
 
-"""
-# Add index heading
-doc.add_heading('Index', level=2)
-"""
 
-# Placeholder for index entries
-index_paragraphs = []
+USAGE = "USAGE: \npython3 json_to_docx.py <json_file> <with_thoughts>\nwhere\n* <json_file> is the filename of the json file of the run (without the extention)\n* <with_thoughts> is either True or False, and determines whether the Thoughts are processed or not."
 
 # Define color mappings for thought types
 color_mapping = {
@@ -58,6 +51,9 @@ def process_thoughts(doc, L):
         paragraph.add_run("<No Thoughts>")
 
 def main (filename, with_thoughts):
+    if with_thoughts == None:
+        raise ValueError
+
     # Load the JSON file
     with open(filename+".json", 'r') as file:
         data = json.load(file)
@@ -114,7 +110,11 @@ def main (filename, with_thoughts):
     doc.save(new_filename)
 
 try:
-    with_thoughts = True if sys.argv[2]=="True" else False
+    with_thoughts = None
+    if sys.argv[2]=="True":
+        with_thoughts = True
+    if sys.argv[2]=="False":
+        with_thoughts = False
     main(sys.argv[1], with_thoughts)
-except IndexError:
-    main("one_test_to_rule_them_all", with_thoughts=True)
+except (IndexError, ValueError):
+    print(USAGE)
